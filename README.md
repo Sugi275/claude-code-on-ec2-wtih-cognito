@@ -76,6 +76,13 @@ npm run list
 4. TOTP MFA の設定 (Google Authenticator 等)
 5. code-server が表示される
 
+詳細な手順は以下のドキュメントを参照してください。
+
+| ドキュメント | 対象 | 内容 |
+|---|---|---|
+| [デプロイ方法](docs/deploy.md) | 管理者 | CloudShell からのデプロイ手順 |
+| [ログイン方法](docs/login.md) | お客様 | ログイン〜Claude Code 初期設定〜ファイル操作 |
+
 ## 削除
 
 ```bash
