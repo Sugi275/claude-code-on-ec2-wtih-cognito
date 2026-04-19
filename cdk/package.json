@@ -6,6 +6,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "postinstall": "cd lambda/auth && npm install",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
