@@ -36,6 +36,10 @@ aws ssm put-parameter \
   --region ap-northeast-1
 ```
 
+複数行のテキストを貼り付けると「Safe Paste for multiline text」というダイアログが表示されます。内容を確認して **Paste** ボタンをクリックしてください。
+
+![Safe Paste ダイアログ](assets/deploy-03-paste-dialog.png)
+
 ## 4. リポジトリをクローン
 
 CloudShell のターミナルに以下のコマンドを貼り付けて Enter を押します。
