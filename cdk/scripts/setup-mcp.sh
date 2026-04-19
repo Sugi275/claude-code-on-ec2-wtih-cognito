@@ -107,7 +107,7 @@ chown ubuntu:ubuntu "$MCP_CONFIG"
 chown -R ubuntu:ubuntu "$SETTINGS_DIR"
 
 # --- Skills (spec-driven-presentation-maker) ---
-SKILLS_DIR="/home/ubuntu/claudecode/.claude/skills"
+SKILLS_DIR="/home/ubuntu/.claude/skills"
 if [ ! -d "$SKILLS_DIR/presentation-maker" ]; then
   mkdir -p "$SKILLS_DIR"
   TMP_DIR=$(mktemp -d)
