@@ -8,6 +8,13 @@
 | [削除方法](docs/destroy.md) | AWS 管理者 | 環境の削除手順 |
 | [ログイン方法](docs/login.md) | Claude Code 利用者 | ログイン〜Claude Code 初期設定〜ファイル操作 |
 
+# 特徴
+
+- **簡単セットアップ** — CloudShell からコマンドを実行するだけでデプロイ完了
+- **ブラウザだけで完結** — ローカル PC への追加インストール不要
+- **MFA 対応** — Cognito + TOTP (Authy 等) でセキュアにログイン
+- **ユーザーごとに独立** — 1 人 1 台の EC2 でパフォーマンスもセキュリティも分離
+
 ## アーキテクチャ
 
 ```
@@ -55,3 +62,14 @@
 - CloudFront VPC Origin は WebSocket 非対応のため、EC2 は Public Subnet に配置し、Security Group で CloudFront の IP レンジ (AWS Managed Prefix List) のみ許可しています
 - Lambda@Edge では WebSocket アップグレードリクエストと code-server の静的アセット (`/static/`, `/_static/`) は認証をスキップします
 - EC2 の IAM Role には Bedrock (InvokeModel) と Marketplace (Subscribe) の権限が付与されています
+
+## アーキテクチャの他の選択肢
+
+導入手順をできるだけ簡単にするため、独自ドメインや追加サービスが不要な構成を選択しました。
+
+| 選択肢 | 不採用の理由 |
+|---|---|
+| ALB + Cognito Managed Login | ALB の HTTPS リスナーには独自ドメイン + ACM 証明書が必要 |
+| MFA を Email (SES) で実施 | SES の利用には独自ドメインの検証が必要 |
+
+→ CloudFront (デフォルトドメイン) + Cognito Managed Login + TOTP MFA + EC2 の構成を採用。
