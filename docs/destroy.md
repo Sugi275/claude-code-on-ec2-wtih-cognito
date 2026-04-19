@@ -51,6 +51,6 @@ npm run destroy:shared
 
 | スクリプト | 対象スタック | リージョン |
 |---|---|---|
-| `destroy:users` | `CodeServer-user*` | ap-northeast-1 |
+| `destroy:users` | `CodeServer-{userName}-*` | ap-northeast-1 |
 | `destroy:edge` | `EdgeAuth-*` | us-east-1 |
 | `destroy:shared` | `CodeServer-Vpc-*` | ap-northeast-1 |
