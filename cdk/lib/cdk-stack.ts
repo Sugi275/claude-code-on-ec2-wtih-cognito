@@ -135,7 +135,9 @@ export class CodeServerStack extends cdk.Stack {
       // Bedrock test invoke to trigger Marketplace subscription
       `echo '{"anthropic_version":"bedrock-2023-05-31","max_tokens":1,"messages":[{"role":"user","content":"hi"}]}' > /tmp/bedrock-body.json`,
       `for MODEL in us.anthropic.claude-sonnet-4-6 us.anthropic.claude-opus-4-7 us.anthropic.claude-opus-4-6-v1 us.anthropic.claude-haiku-4-5-20251001-v1:0; do echo "Invoking $MODEL (us-east-1)..." && aws bedrock-runtime invoke-model --model-id "$MODEL" --region us-east-1 --body fileb:///tmp/bedrock-body.json --content-type application/json --accept application/json /dev/null 2>&1 || true; done`,
-      `for MODEL in global.anthropic.claude-sonnet-4-6 global.anthropic.claude-opus-4-7 global.anthropic.claude-opus-4-6-v1 global.anthropic.claude-haiku-4-5-20251001-v1:0; do echo "Invoking $MODEL (us-east-1)..." && aws bedrock-runtime invoke-model --model-id "$MODEL" --region us-east-1 --body fileb:///tmp/bedrock-body.json --content-type application/json --accept application/json /dev/null 2>&1 || true; done`
+      `for MODEL in global.anthropic.claude-sonnet-4-6 global.anthropic.claude-opus-4-7 global.anthropic.claude-opus-4-6-v1 global.anthropic.claude-haiku-4-5-20251001-v1:0; do echo "Invoking $MODEL (us-east-1)..." && aws bedrock-runtime invoke-model --model-id "$MODEL" --region us-east-1 --body fileb:///tmp/bedrock-body.json --content-type application/json --accept application/json /dev/null 2>&1 || true; done`,
+      // MCP server setup (reads Brave API key from SSM if available)
+      "curl -fsSL https://raw.githubusercontent.com/Sugi275/claude-code-on-ec2-wtih-cognito/main/cdk/scripts/setup-mcp.sh | bash"
     );
 
     const instance = new ec2.Instance(this, "Instance", {
@@ -159,6 +161,26 @@ export class CodeServerStack extends cdk.Stack {
 
     instance.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
+    );
+
+    // SSM read for MCP API keys (Brave Search)
+    instance.role.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        actions: ["ssm:GetParameter"],
+        resources: [
+          `arn:aws:ssm:ap-northeast-1:${cdk.Aws.ACCOUNT_ID}:parameter/codeserver/*`,
+        ],
+      })
+    );
+
+    // SSM Parameter Store read for MCP API keys
+    instance.role.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        actions: ["ssm:GetParameter"],
+        resources: [
+          `arn:aws:ssm:ap-northeast-1:${cdk.Aws.ACCOUNT_ID}:parameter/codeserver/*`,
+        ],
+      })
     );
 
     // Bedrock permissions for Claude Code
