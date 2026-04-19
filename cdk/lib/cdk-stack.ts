@@ -119,10 +119,8 @@ export class CodeServerStack extends cdk.Stack {
       "set -ex",
       "export HOME=/root",
       "apt-get update -y",
+      // code-server
       "curl -fsSL https://code-server.dev/install.sh | sh",
-      "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -",
-      "apt-get install -y nodejs",
-      "npm install -g @anthropic-ai/claude-code",
       "mkdir -p /home/ubuntu/.config/code-server",
       'cat > /home/ubuntu/.config/code-server/config.yaml << EOF',
       "bind-addr: 0.0.0.0:8080",
@@ -130,7 +128,10 @@ export class CodeServerStack extends cdk.Stack {
       "cert: false",
       "EOF",
       "chown -R ubuntu:ubuntu /home/ubuntu/.config",
-      "systemctl enable --now code-server@ubuntu"
+      "systemctl enable --now code-server@ubuntu",
+      // Claude Code
+      "su - ubuntu -c 'curl -fsSL https://claude.ai/install.sh | bash'",
+      "su - ubuntu -c 'mkdir -p ~/claudecode'"
     );
 
     const instance = new ec2.Instance(this, "Instance", {
