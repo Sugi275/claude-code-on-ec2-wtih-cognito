@@ -4,8 +4,8 @@
 
 | ドキュメント | 対象 | 内容 |
 |---|---|---|
-| [デプロイ方法](docs/deploy.md) | 管理者 | CloudShell からのデプロイ手順 |
-| [ログイン方法](docs/login.md) | お客様 | ログイン〜Claude Code 初期設定〜ファイル操作 |
+| [デプロイ方法](docs/deploy.md) | AWS 管理者 | CloudShell からのデプロイ手順 |
+| [ログイン方法](docs/login.md) | Claude Code 利用者 | ログイン〜Claude Code 初期設定〜ファイル操作 |
 
 ## アーキテクチャ
 
