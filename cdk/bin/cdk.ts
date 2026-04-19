@@ -1,15 +1,24 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
+import * as fs from "fs";
+import * as path from "path";
 import { VpcStack } from "../lib/vpc-stack";
 import { CodeServerStack } from "../lib/cdk-stack";
 
 const app = new cdk.App();
 
-// ユーザーリスト: ここに追加・削除するだけでスタックが増減する
-const users = ["user-a", "user-b"];
+// ユーザーリスト: users.txt から読み込み (ユーザー名,メールアドレス)
+const usersFile = path.join(__dirname, "../users.txt");
+const users = fs
+  .readFileSync(usersFile, "utf-8")
+  .split("\n")
+  .map((l) => l.trim())
+  .filter((l) => l && !l.startsWith("#"))
+  .map((l) => {
+    const [userName, email] = l.split(",").map((s) => s.trim());
+    return { userName, email };
+  });
 
-// スタック名のサフィックス
-// 通常は固定。再作成が必要なときだけ変更: cdk deploy --all -c suffix=002
 const suffix = app.node.tryGetContext("suffix") || "001";
 
 const env = {
@@ -19,9 +28,10 @@ const env = {
 
 const vpcStack = new VpcStack(app, `CodeServer-Vpc-${suffix}`, { env });
 
-for (const userName of users) {
+for (const { userName, email } of users) {
   new CodeServerStack(app, `CodeServer-${userName}-${suffix}`, {
     userName,
+    email,
     vpc: vpcStack.vpc,
     env,
   });

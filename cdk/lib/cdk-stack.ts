@@ -11,8 +11,11 @@ import * as path from "path";
 import * as fs from "fs";
 import { execSync } from "child_process";
 
+import * as cr from "aws-cdk-lib/custom-resources";
+
 export interface CodeServerStackProps extends cdk.StackProps {
   userName: string;
+  email: string;
   vpc: ec2.Vpc;
   instanceType?: string;
 }
@@ -21,7 +24,7 @@ export class CodeServerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: CodeServerStackProps) {
     super(scope, id, props);
 
-    const { userName, vpc, instanceType = "t3.large" } = props;
+    const { userName, email, vpc, instanceType = "t3.large" } = props;
     const ssmPrefix = `/codeserver/${userName}`;
 
     // --- Security Group (CloudFront origin-facing IPs only) ---
@@ -55,6 +58,15 @@ export class CodeServerStack extends cdk.Stack {
       },
       accountRecovery: cognito.AccountRecovery.NONE,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      userInvitation: {
+        emailSubject: "【Claude Code】開発環境のご案内",
+        emailBody:
+          "Claude Code 開発環境をご利用いただけるようになりました。\n\n" +
+          "以下の情報でログインしてください。\n\n" +
+          "メールアドレス: {username}\n" +
+          "仮パスワード: {####}\n\n" +
+          "初回ログイン時にパスワードの変更と、認証アプリ (Google Authenticator, Authy 等) による MFA の設定が必要です。",
+      },
     });
 
     const cfnUserPool = userPool.node.defaultChild as cognito.CfnUserPool;
@@ -252,6 +264,30 @@ export class CodeServerStack extends cdk.Stack {
       `https://${distribution.distributionDomainName}`,
     ];
 
+    // --- Cognito User (auto-created on deploy) ---
+    new cr.AwsCustomResource(this, "CognitoUser", {
+      onCreate: {
+        service: "CognitoIdentityServiceProvider",
+        action: "adminCreateUser",
+        parameters: {
+          UserPoolId: userPool.userPoolId,
+          Username: email,
+          UserAttributes: [
+            { Name: "email", Value: email },
+            { Name: "email_verified", Value: "true" },
+          ],
+          TemporaryPassword: "TempPass1!",
+        },
+        physicalResourceId: cr.PhysicalResourceId.of(`cognito-user-${userName}`),
+      },
+      policy: cr.AwsCustomResourcePolicy.fromStatements([
+        new iam.PolicyStatement({
+          actions: ["cognito-idp:AdminCreateUser"],
+          resources: [userPool.userPoolArn],
+        }),
+      ]),
+    });
+
     // --- Outputs ---
     new cdk.CfnOutput(this, "CloudFrontUrl", {
       value: `https://${distribution.distributionDomainName}`,
@@ -259,9 +295,6 @@ export class CodeServerStack extends cdk.Stack {
     });
     new cdk.CfnOutput(this, "UserPoolId", {
       value: userPool.userPoolId,
-    });
-    new cdk.CfnOutput(this, "CreateUserCommand", {
-      value: `aws cognito-idp admin-create-user --user-pool-id ${userPool.userPoolId} --username USER_EMAIL --user-attributes Name=email,Value=USER_EMAIL Name=email_verified,Value=true --temporary-password 'TempPass1!' --region ap-northeast-1`,
     });
   }
 }

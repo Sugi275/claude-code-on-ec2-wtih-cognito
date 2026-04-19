@@ -32,11 +32,6 @@
 - Node.js 18+
 - AWS CLI (設定済み)
 - CDK CLI (`npm install -g aws-cdk`)
-- CDK Bootstrap 済み (ap-northeast-1 と us-east-1 の両方)
-  ```bash
-  cdk bootstrap aws://ACCOUNT_ID/ap-northeast-1
-  cdk bootstrap aws://ACCOUNT_ID/us-east-1
-  ```
 - Bedrock で Claude モデルへのアクセスを有効化済み
 
 ## セットアップ
@@ -58,12 +53,19 @@ const users = ["user-a", "user-b", "user-c", "user-d", "user-e"];
 
 ```bash
 cd cdk
+npm install
+npm run deploy
+```
 
-# 全ユーザー分デプロイ
-npx cdk deploy --all --require-approval never
+`npm run deploy` は以下を自動実行します:
+1. CDK Bootstrap (ap-northeast-1 + us-east-1)
+2. 全スタックの並列デプロイ
 
+個別操作が必要な場合:
+
+```bash
 # 特定ユーザーだけデプロイ
-npx cdk deploy CodeServer-user-a-001 EdgeAuth-user-a
+npx cdk deploy CodeServer-user-a-001 EdgeAuth-user-a --require-approval never
 ```
 
 スタック名のサフィックス (`001`) は `cdk/bin/cdk.ts` の `suffix` で管理。
