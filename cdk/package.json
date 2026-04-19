@@ -11,7 +11,9 @@
     "test": "jest",
     "cdk": "cdk",
     "deploy": "npx cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/ap-northeast-1 aws://$(aws sts get-caller-identity --query Account --output text)/us-east-1 && npx cdk deploy --all --require-approval never --concurrency 10",
-    "destroy": "npx cdk destroy --all --force --concurrency 10",
+    "destroy:users": "npx cdk destroy 'CodeServer-user*' --force --concurrency 10",
+    "destroy:edge": "npx cdk destroy 'EdgeAuth-*' --force --concurrency 10",
+    "destroy:shared": "npx cdk destroy 'CodeServer-Vpc-*' --force",
     "list": "aws cloudformation describe-stacks --query 'Stacks[?starts_with(StackName,`CodeServer-user`)].{User:StackName,URL:Outputs[?OutputKey==`CloudFrontUrl`].OutputValue|[0]}' --output table --region ap-northeast-1"
   },
   "devDependencies": {
