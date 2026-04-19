@@ -119,6 +119,17 @@ export class CodeServerStack extends cdk.Stack {
       "set -ex",
       "export HOME=/root",
       "apt-get update -y",
+      // AWS CLI
+      "apt-get install -y unzip",
+      'curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip',
+      "unzip -q /tmp/awscliv2.zip -d /tmp && /tmp/aws/install",
+      // Node.js
+      "curl -fsSL https://deb.nodesource.com/setup_22.x | bash -",
+      "apt-get install -y nodejs",
+      // uv (Python package runner, for AWS Knowledge MCP proxy)
+      "su - ubuntu -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'",
+      "ln -sf /home/ubuntu/.local/bin/uv /usr/local/bin/uv",
+      "ln -sf /home/ubuntu/.local/bin/uvx /usr/local/bin/uvx",
       // code-server
       "curl -fsSL https://code-server.dev/install.sh | sh",
       "mkdir -p /home/ubuntu/.config/code-server",
