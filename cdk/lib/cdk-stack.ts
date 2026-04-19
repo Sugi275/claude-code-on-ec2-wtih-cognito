@@ -61,10 +61,11 @@ export class CodeServerStack extends cdk.Stack {
       userInvitation: {
         emailSubject: "【Claude Code】開発環境のご案内",
         emailBody:
-          "Claude Code 開発環境をご利用いただけるようになりました。\n\n" +
-          "以下の情報でログインしてください。\n\n" +
-          "メールアドレス: {username}\n" +
-          "仮パスワード: {####}\n\n" +
+          "Claude Code 開発環境をご利用いただけるようになりました。<br><br>" +
+          "以下の情報でログインしてください。<br><br>" +
+          "メールアドレス: {username}<br>" +
+          "仮パスワード: {####}<br><br>" +
+          "ログイン URL は管理者からお知らせします。<br><br>" +
           "初回ログイン時にパスワードの変更と、認証アプリ (Google Authenticator, Authy 等) による MFA の設定が必要です。",
       },
     });

@@ -2,31 +2,6 @@
 
 ブラウザだけで Claude Code が使える開発環境を、ユーザーごとに独立してデプロイする CDK プロジェクトです。
 
-## アーキテクチャ
-
-```
-ブラウザ (HTTPS)
-  → CloudFront (*.cloudfront.net, ドメイン不要)
-  → Lambda@Edge (cognito-at-edge, Viewer Request)
-  → Cognito Managed Login (TOTP MFA)
-  → EC2 (Ubuntu 24.04, code-server + Claude Code)
-```
-
-### 共有リソース (1 つだけ)
-
-- VPC (Public Subnet × 2AZ, NAT なし)
-
-### 1 ユーザーあたりのリソース
-
-- CloudFront ディストリビューション
-- Lambda@Edge (認証)
-- Cognito User Pool (Essentials tier, TOTP MFA, Managed Login v2)
-- Cognito Managed Login Branding
-- EC2 インスタンス (t3.large)
-- Security Group (CloudFront IP レンジのみ許可)
-- SSM Parameters × 3 (Lambda@Edge 用 Cognito 設定)
-- IAM Role (SSM + Bedrock + Marketplace)
-
 ## 前提条件
 
 - Node.js 18+
@@ -43,11 +18,15 @@ npm install
 
 ## ユーザー管理
 
-`cdk/bin/cdk.ts` のユーザーリストを編集:
+`cdk/users.txt` を編集 (1行1ユーザー、ユーザー名とメールアドレスをカンマ区切り):
 
-```typescript
-const users = ["user-a", "user-b", "user-c", "user-d", "user-e"];
 ```
+# ユーザー名,メールアドレス
+user-a,testusera@example.com
+user-b,testuserb@example.com
+```
+
+デプロイ時に Cognito ユーザーが自動作成され、招待メールが送信されます。
 
 ## デプロイ
 
@@ -77,21 +56,17 @@ npx cdk deploy --all -c suffix=002
 
 ## ユーザー作成
 
-デプロイ後、Cognito にユーザーを作成:
-
-```bash
-aws cognito-idp admin-create-user \
-  --user-pool-id <UserPoolId from output> \
-  --username user@example.com \
-  --user-attributes Name=email,Value=user@example.com Name=email_verified,Value=true \
-  --temporary-password 'TempPass1!' \
-  --region ap-northeast-1
-```
+デプロイ時に Cognito にユーザーが自動作成され、招待メールが送信されます。
 
 ## お客様に渡す情報
 
-1. CloudFront URL (Output の `CloudFrontUrl`)
-2. メールアドレスと仮パスワード
+1. CloudFront URL (`npm run list` で確認)
+2. メールアドレスと仮パスワード (招待メールで自動送信)
+
+```bash
+cd cdk
+npm run list
+```
 
 ## お客様のログインフロー
 
@@ -114,6 +89,31 @@ npx cdk destroy --all
 ```
 
 > **注意**: Lambda@Edge と CloudFront の削除には数分〜数時間かかることがあります (エッジロケーションのレプリカ削除待ち)。
+
+## アーキテクチャ
+
+```
+ブラウザ (HTTPS)
+  → CloudFront (*.cloudfront.net, ドメイン不要)
+  → Lambda@Edge (cognito-at-edge, Viewer Request)
+  → Cognito Managed Login (TOTP MFA)
+  → EC2 (Ubuntu 24.04, code-server + Claude Code)
+```
+
+### 共有リソース (1 つだけ)
+
+- VPC (Public Subnet × 2AZ, NAT なし)
+
+### 1 ユーザーあたりのリソース
+
+- CloudFront ディストリビューション
+- Lambda@Edge (認証)
+- Cognito User Pool (Essentials tier, TOTP MFA, Managed Login v2)
+- Cognito Managed Login Branding
+- EC2 インスタンス (t3.large)
+- Security Group (CloudFront IP レンジのみ許可)
+- SSM Parameters × 3 (Lambda@Edge 用 Cognito 設定)
+- IAM Role (SSM + Bedrock + Marketplace)
 
 ## 概算コスト (東京リージョン, 月額)
 
