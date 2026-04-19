@@ -1,0 +1,9 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.967.0",
+    "cognito-at-edge": "^1.5.3"
+  }
+}
