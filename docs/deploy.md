@@ -50,15 +50,15 @@ git clone https://github.com/Sugi275/claude-code-on-ec2-wtih-cognito
 
 ## 5. ユーザーを設定
 
-以下のコマンドをコピーして CloudShell に貼り付けます。`ユーザー名,メールアドレス` の部分を、実際に利用するユーザーの情報に書き換えてください。
+以下のコマンドをコピーして CloudShell に貼り付けます。`username,email` の部分を、実際に利用するユーザーの情報に書き換えてください。
 
-- **ユーザー名**: 半角英字のみ（記号はエラーの原因になるため使用しないでください）
-- **メールアドレス**: 招待メールの送信先
+- **username**: 半角英字のみ（記号はエラーの原因になるため使用しないでください）
+- **email**: 招待メールの送信先
 
 ```
 cat <<'EOF' > ~/claude-code-on-ec2-wtih-cognito/cdk/users.txt
-usera,user-a@example.com
-userb,user-b@example.com
+satou,satou@example.com
+suzuki,suzuki@example.com
 EOF
 ```
 

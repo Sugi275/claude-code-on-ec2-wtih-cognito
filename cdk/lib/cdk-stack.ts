@@ -174,6 +174,9 @@ export class CodeServerStack extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
     );
 
+    // Cost allocation tag (activate "user" in Billing > Cost allocation tags)
+    cdk.Tags.of(instance).add("user", userName);
+
     // SSM read for MCP API keys (Brave Search)
     instance.role.addToPrincipalPolicy(
       new iam.PolicyStatement({
